@@ -7,23 +7,24 @@ class RangeList {
     this.ranges = [];
   }
 
-  getListByRange(range, remove = 0) {
+  getListByRange(range) {
+    if (!this.isValidRange(range)) {
+      return [];
+    }
     const start = range[0];
-    const size = range[1] - range[0] + Number(remove);
+    const size = range[1] - range[0];
     return [...Array(size).keys()].map((number) => number + start);
   }
 
-  getAllCurrentLists() {
-    return this.ranges.map((range) => this.getListByRange(range));
-  }
+  getAllCurrentNumbers() {
+    const mergedNumbers = [];
+    this.ranges
+      .map((range) => this.getListByRange(range))
+      .forEach((list) => {
+        mergedNumbers.push(...list);
+      });
 
-  mergeLists(flatenRanges) {
-    const merged = [];
-    flatenRanges.forEach((flatenRange) => {
-      merged.push(...flatenRange);
-    });
-
-    return merged;
+    return mergedNumbers;
   }
 
   isValidRange(range) {
@@ -39,7 +40,10 @@ class RangeList {
     );
   }
 
-  hasIntersaction(existingRange, newRange) {
+  hasIntersection(existingRange, newRange) {
+    if (!this.isValidRange(existingRange) || !this.isValidRange(newRange)) {
+      return false;
+    }
     const newRangeStart = newRange[0];
     const newRangeEnd = newRange[1];
     const existingRangeStart = existingRange[0];
@@ -51,13 +55,20 @@ class RangeList {
     return true;
   }
 
-  hasNoIntersactionToAllExistingRange(newRange) {
+  hasNoIntersectionToAllExistingRange(newRange) {
+    if (!this.isValidRange(newRange)) {
+      return true;
+    }
     return this.ranges.every((range) => {
-      return !this.hasIntersaction(range, newRange);
+      return !this.hasIntersection(range, newRange);
     });
   }
 
-  convertToRanges(list) {
+  convertNumberListToRange(list) {
+    if (!list) {
+      return [];
+    }
+
     const ranges = [];
     const tempList = [];
     let previousNumber = null;
@@ -87,6 +98,9 @@ class RangeList {
   }
 
   formatRangeForOutput(range) {
+    if (!this.isValidRange(range)) {
+      return "";
+    }
     return `[${range[0]} ${range[range.length - 1]})`;
   }
 
@@ -96,23 +110,16 @@ class RangeList {
       return false;
     }
 
-    if (this.hasNoIntersactionToAllExistingRange(newRange)) {
-      this.ranges.push(newRange);
-      return;
-    }
-
-    const newList = this.getListByRange(newRange);
-    const allCurrentLists = this.getAllCurrentLists();
-
-    allCurrentLists.push(newList);
-
-    const mergedList = this.mergeLists(allCurrentLists);
+    const listOfNumbersToAdd = this.getListByRange(newRange);
+    const allCurrentNumbers = this.getAllCurrentNumbers();
+    const mergedListOfNumbers = [...listOfNumbersToAdd, ...allCurrentNumbers];
     const sortedMergedListWithDuplicationRemoved = [
-      ...new Set(mergedList),
+      ...new Set(mergedListOfNumbers),
     ].sort((a, b) => a - b);
 
-    // console.log("list", sortedMergedListWithDuplicationRemoved);
-    this.ranges = this.convertToRanges(sortedMergedListWithDuplicationRemoved);
+    this.ranges = this.convertNumberListToRange(
+      sortedMergedListWithDuplicationRemoved
+    );
   }
 
   remove(range) {
@@ -121,13 +128,13 @@ class RangeList {
       return false;
     }
 
-    if (this.hasNoIntersactionToAllExistingRange(range)) {
+    if (this.hasNoIntersectionToAllExistingRange(range)) {
       console.log("No range is removed");
       return false;
     }
 
     const numbersToRemove = this.getListByRange(range);
-    const allCurrentNumbers = this.mergeLists(this.getAllCurrentLists());
+    const allCurrentNumbers = this.getAllCurrentNumbers();
     const mirroredNumbers = deepCopy(allCurrentNumbers);
 
     mirroredNumbers.forEach((number) => {
@@ -137,7 +144,7 @@ class RangeList {
       }
     });
 
-    this.ranges = this.convertToRanges(allCurrentNumbers);
+    this.ranges = this.convertNumberListToRange(allCurrentNumbers);
   }
 
   print() {
