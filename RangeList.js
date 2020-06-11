@@ -2,6 +2,8 @@ const deepCopy = (item) => {
   return JSON.parse(JSON.stringify(item));
 };
 
+const sortAsc = (a, b) => a - b;
+
 class RangeList {
   constructor() {
     this.ranges = [];
@@ -69,6 +71,8 @@ class RangeList {
       return [];
     }
 
+    list.sort(sortAsc);
+
     const ranges = [];
     const tempList = [];
     let previousNumber = null;
@@ -113,12 +117,10 @@ class RangeList {
     const listOfNumbersToAdd = this.getListByRange(newRange);
     const allCurrentNumbers = this.getAllCurrentNumbers();
     const mergedListOfNumbers = [...listOfNumbersToAdd, ...allCurrentNumbers];
-    const sortedMergedListWithDuplicationRemoved = [
-      ...new Set(mergedListOfNumbers),
-    ].sort((a, b) => a - b);
+    const mergedListWithDuplicationRemoved = [...new Set(mergedListOfNumbers)];
 
     this.ranges = this.convertNumberListToRange(
-      sortedMergedListWithDuplicationRemoved
+      mergedListWithDuplicationRemoved
     );
   }
 
@@ -129,7 +131,6 @@ class RangeList {
     }
 
     if (this.hasNoIntersectionToAllExistingRange(range)) {
-      console.log("No range is removed");
       return false;
     }
 
