@@ -4,6 +4,15 @@ const deepCopy = (item) => {
 
 const sortAsc = (a, b) => a - b;
 
+const isArrayOfNumbers = (list) => {
+  return (
+    Array.isArray(list) &&
+    list.every((item) => {
+      return Number(item) === item;
+    })
+  );
+};
+
 class RangeList {
   constructor() {
     this.ranges = [];
@@ -67,7 +76,8 @@ class RangeList {
   }
 
   convertNumberListToRange(list) {
-    if (!list) {
+    if (!isArrayOfNumbers(list)) {
+      console.log("Invalid input.");
       return [];
     }
 
