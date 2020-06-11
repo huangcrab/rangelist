@@ -39,15 +39,8 @@ class RangeList {
   }
 
   isValidRange(range) {
-    if (!Array.isArray(range)) {
-      return false;
-    }
-
     return (
-      range.length === 2 &&
-      !isNaN(range[0]) &&
-      !isNaN(range[1]) &&
-      range[0] <= range[1]
+      isArrayOfNumbers(range) && range.length === 2 && range[0] <= range[1]
     );
   }
 
